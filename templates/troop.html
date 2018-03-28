@@ -6,6 +6,7 @@
 		<tr>
 			<th class="troopnames">{{semestername}}<br/><span class="heading">{{heading}}</span></th>
 			<th class="removebutton extrainfo col-hidden" style="display:none"></th>
+			<th class="patrullerdata" style="display:none" width="100">PatrullData</th>
 			<th class="patruller extrainfo col-hidden" style="display:none" width="100">Patrull</th>
 			<th class="personnr extrainfo col-hidden" style="display:none">Personnr</th>
 			{% for meeting in meetings %}
@@ -15,26 +16,28 @@
 	  </thead>
 	  <tbody>
 		{% for person in persons %}{% set iperson = loop.index0 %}{% set isleader = trooppersons[iperson].leader %}
-		<tr class="{{person.key.urlsafe()}}"><td class="name-field troopnames" id="name{{person.key.urlsafe()}}" data-leader="{% if isleader %}1{% else %}0{% endif %}" title="{{person.getname()}}{% if isleader %} (Ledare){% endif %}{%if person.removed %} borttagen i scoutnet{%endif%}">
-			<a href="{{baselink+person.key.urlsafe()}}/">
-			{{loop.index}}:{{person.getnameWithStatus()}}{% if isleader %}(L){% endif %}
-			</a>
-		</td>
-		<td class="removebutton extrainfo" style="display:none">
-			<button data-person="{{person.key.urlsafe()}}" class="btn btn-warning btnRemoveFromTroop" title="Ta bort från avdelning">Ta bort</button>
-		</td>
-		<td class="patruller extrainfo" style="display:none" width="100">
-			<div class="input-group">
-				<input type="text" class="form-control input-sm patrolNameInput" size="12" name="{{person.key.urlsafe()}}" value="{{person.getpatrol()}}"/>
-				<span class="input-group-btn">
-					<button class="btn btn-sm btn-secondary savepatrol" type="button"><span class="glyphicon glyphicon-floppy-save"></span></button>
-				</span>
-			</div>
-		</td>
-		<td class="personnr extrainfo" style="display:none">{{person.personnr}}</td>
-		{% for meeting in meetings %} {# name is meeting, id is the person #}{% set imeeting = loop.index0 %}
-			<td><input title="{{meeting.getdate()}}: {{person.getname()}}" class="attendance-cb checkbox big-checkbox" name="cb{{meeting.key.urlsafe()}}" id="{{person.key.urlsafe()}}" type="checkbox" {%if attendances[imeeting][iperson]%}checked=""{% endif %}/></td>
-		{% endfor %}
+		<tr class="{{person.key.urlsafe()}}">
+			<td class="name-field troopnames" id="name{{person.key.urlsafe()}}" data-leader="{% if isleader %}1{% else %}0{% endif %}" title="{{person.getname()}}{% if isleader %} (Ledare){% endif %}{%if person.removed %} borttagen i scoutnet{%endif%}">
+				<a href="{{baselink+person.key.urlsafe()}}/">
+				{{loop.index}}:{{person.getnameWithStatus()}}{% if isleader %}(L){% endif %}
+				</a>
+			</td>
+			<td class="removebutton extrainfo" style="display:none">
+				<button data-person="{{person.key.urlsafe()}}" class="btn btn-warning btnRemoveFromTroop" title="Ta bort från avdelning">Ta bort</button>
+			</td>
+			<td class="patrullerdata" style="display:none">{{person.getpatrol()}}</td>
+			<td class="patruller extrainfo" style="display:none" width="100">
+				<div class="input-group">
+					<input type="text" class="form-control input-sm patrolNameInput" size="12" name="{{person.key.urlsafe()}}" value="{{person.getpatrol()}}"/>
+					<span class="input-group-btn">
+						<button class="btn btn-sm btn-secondary savepatrol" type="button"><span class="glyphicon glyphicon-floppy-save"></span></button>
+					</span>
+				</div>
+			</td>
+			<td class="personnr extrainfo" style="display:none">{{person.personnr}}</td>
+			{% for meeting in meetings %} {# name is meeting, id is the person #}{% set imeeting = loop.index0 %}
+				<td><input title="{{meeting.getdate()}}: {{person.getname()}}" class="attendance-cb checkbox big-checkbox" name="cb{{meeting.key.urlsafe()}}" id="{{person.key.urlsafe()}}" type="checkbox" {%if attendances[imeeting][iperson]%}checked=""{% endif %}/></td>
+			{% endfor %}
 		</tr>
 		{% endfor %}
 		{% if meetings %}
@@ -148,7 +151,13 @@ $(document).ready(function() {
 		searching:false,
 		bScrollCollapse:true,
 		bScrollAutoCss:true,
-		bAutoWidth:true
+		bAutoWidth:true,
+		order: [[2, 'asc']],
+        rowGroup: {
+            dataSrc: function (row) {
+				return row;
+			}
+        }
 		//responsive:true
     });
 	setTimeout(function (){
